@@ -5,34 +5,544 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>T4H Master Dashboard</title>
   <meta name="description" content="Internal T4H master dashboard">
-  <!-- T4H-BRAND-INJECT v1 group=G7 -->
   <link rel="icon" type="image/png" sizes="32x32" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
-  <link rel="icon" type="image/x-icon" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.ico">
-  <link rel="apple-touch-icon" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
-  <meta property="og:title" content="T4H Master Dashboard">
-  <meta property="og:description" content="Internal T4H master dashboard">
-  <meta property="og:image" content="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
-  <!-- /T4H-BRAND-INJECT -->
   <style>
-    body { margin:0; font-family:-apple-system,sans-serif; background:#0a0a0a; color:#fff; min-height:100vh; display:flex; flex-direction:column; }
-    main { flex:1; display:flex; align-items:center; justify-content:center; padding:40px 20px; text-align:center; }
-    h1 { font-size:2rem; font-weight:700; margin:0 0 12px; }
-    p { color:#888; margin:0; }
-    .dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#64748b; margin-right:8px; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0e1a; --bg2: #0f1629; --bg3: #1a2035;
+      --border: #1e2d4a; --text: #e2e8f0; --muted: #64748b;
+      --cyan: #00d4ff; --green: #00ff88; --amber: #ffaa00;
+      --red: #ff4444; --purple: #a855f7;
+    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, 'Segoe UI', sans-serif; min-height: 100vh; }
+    
+    /* NAV */
+    nav { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 0; position: sticky; top: 0; z-index: 100; }
+    .nav-brand { color: var(--cyan); font-weight: 700; font-size: 14px; letter-spacing: 2px; padding: 16px 0; margin-right: 32px; }
+    .nav-brand span { color: var(--muted); font-weight: 400; font-size: 11px; display: block; letter-spacing: 0; }
+    .nav-tab { padding: 16px 16px; font-size: 13px; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
+    .nav-tab:hover { color: var(--text); }
+    .nav-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+    .nav-meta { margin-left: auto; display: flex; gap: 20px; align-items: center; }
+    .stat-pill { font-size: 12px; display: flex; align-items: center; gap: 6px; }
+    .stat-pill .num { font-weight: 700; font-size: 15px; }
+    .stat-pill .num.ok { color: var(--green); }
+    .stat-pill .num.warn { color: var(--amber); }
+    .stat-pill .num.err { color: var(--red); }
+    .stat-pill .lbl { color: var(--muted); font-size: 11px; line-height: 1; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot.live { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* MAIN */
+    main { padding: 24px; max-width: 1600px; margin: 0 auto; }
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* KPI ROW */
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .kpi { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; }
+    .kpi .num { font-size: 36px; font-weight: 700; line-height: 1; }
+    .kpi .lbl { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi .sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
+    .kpi.cyan .num { color: var(--cyan); }
+    .kpi.green .num { color: var(--green); }
+    .kpi.amber .num { color: var(--amber); }
+    .kpi.red .num { color: var(--red); }
+
+    /* GRID */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .grid-full { margin-bottom: 16px; }
+
+    /* CARD */
+    .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .card-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .card-title .icon { color: var(--cyan); }
+    .card-badge { font-size: 11px; background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; color: var(--muted); }
+    .card-body { padding: 16px 18px; }
+
+    /* TABLE */
+    .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .tbl th { text-align: left; color: var(--muted); font-size: 11px; font-weight: 500; padding: 0 0 10px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+    .tbl td { padding: 10px 0; border-bottom: 1px solid rgba(30,45,74,0.5); vertical-align: top; }
+    .tbl tr:last-child td { border-bottom: none; }
+
+    /* BADGES */
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .badge.live, .badge.LIVE { background: rgba(0,255,136,0.15); color: var(--green); }
+    .badge.building, .badge.BUILDING { background: rgba(0,212,255,0.15); color: var(--cyan); }
+    .badge.declared, .badge.DECLARED { background: rgba(100,116,139,0.15); color: var(--muted); }
+    .badge.verifying, .badge.VERIFYING { background: rgba(168,85,247,0.15); color: var(--purple); }
+    .badge.open { background: rgba(255,170,0,0.15); color: var(--amber); }
+    .badge.done { background: rgba(0,255,136,0.15); color: var(--green); }
+    .badge.pending { background: rgba(255,170,0,0.15); color: var(--amber); }
+    .badge.P1 { background: rgba(255,68,68,0.15); color: var(--red); }
+    .badge.P2 { background: rgba(255,170,0,0.15); color: var(--amber); }
+    .badge.succeeded { background: rgba(0,255,136,0.15); color: var(--green); }
+    .badge.failed { background: rgba(255,68,68,0.15); color: var(--red); }
+    .badge.running { background: rgba(0,212,255,0.15); color: var(--cyan); }
+    .badge.retry { background: rgba(255,170,0,0.1); color: var(--amber); }
+    .badge.escalate { background: rgba(255,68,68,0.1); color: var(--red); }
+    .badge.created { background: rgba(0,255,136,0.1); color: var(--green); }
+
+    /* LOOP STATE MATRIX */
+    .matrix { display: grid; grid-template-columns: 1fr; gap: 6px; }
+    .matrix-row { display: grid; grid-template-columns: 120px 1fr 80px 80px 80px; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(30,45,74,0.5); font-size: 13px; }
+    .matrix-row:last-child { border-bottom: none; }
+    .matrix-head { display: grid; grid-template-columns: 120px 1fr 80px 80px 80px; gap: 12px; padding: 0 0 8px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+
+    /* BAR */
+    .bar-wrap { background: var(--bg3); border-radius: 4px; height: 6px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; background: var(--cyan); transition: width 0.5s; }
+    .bar-fill.green { background: var(--green); }
+    .bar-fill.amber { background: var(--amber); }
+    .bar-fill.red { background: var(--red); }
+
+    /* EMPTY */
+    .empty { color: var(--muted); font-size: 13px; padding: 20px 0; text-align: center; }
+
+    /* LOADING */
+    .loading { color: var(--muted); font-size: 12px; padding: 12px 0; display: flex; align-items: center; gap: 8px; }
+    .spinner { width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* TIME */
+    .ts { font-size: 11px; color: var(--muted); }
+
+    /* DRIFT FLAG */
+    .drift-flag { color: var(--amber); }
+
+    /* RESPONSIVE */
+    @media(max-width: 900px) {
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .nav-meta { display: none; }
+    }
   </style>
 </head>
 <body>
-  <main>
-    <div>
-      <span class="dot"></span>
-      <h1>T4H Master Dashboard</h1>
-      <p>Internal T4H master dashboard</p>
+
+<nav>
+  <div class="nav-brand">T4H<span>MASTER DASHBOARD</span></div>
+  <div class="nav-tab active" onclick="switchTab('loop-os')">⊙ Loop OS</div>
+  <div class="nav-tab" onclick="switchTab('portfolio')">◇ Portfolio</div>
+  <div class="nav-tab" onclick="switchTab('drift')">△ Drift</div>
+  <div class="nav-tab" onclick="switchTab('queue')">⚡ Queue</div>
+  <div class="nav-meta">
+    <div class="stat-pill"><span class="dot live"></span><span><span class="num ok" id="nav-loops-active">—</span><br><span class="lbl">LOOPS ACTIVE</span></span></div>
+    <div class="stat-pill"><span><span class="num ok" id="nav-drift-ok">—</span><br><span class="lbl">DRIFT OK</span></span></div>
+    <div class="stat-pill"><span><span class="num warn" id="nav-needs-attn">—</span><br><span class="lbl">NEEDS ATTENTION</span></span></div>
+    <div class="stat-pill"><span><span class="num" id="nav-rd-spend" style="color:var(--purple)">—</span><br><span class="lbl">R&D SPEND</span></span></div>
+    <div class="ts" id="nav-clock">—</div>
+  </div>
+</nav>
+
+<main>
+
+<!-- ===== LOOP OS PAGE ===== -->
+<div id="page-loop-os" class="page active">
+  <div class="kpi-row">
+    <div class="kpi cyan"><div class="num" id="kpi-total-loops">—</div><div class="lbl">Total Loops</div><div class="sub" id="kpi-loops-sub">—</div></div>
+    <div class="kpi green"><div class="num" id="kpi-active">—</div><div class="lbl">Active</div><div class="sub">Building + Verifying + Live</div></div>
+    <div class="kpi amber"><div class="num" id="kpi-loop-runs">—</div><div class="lbl">Loop Runs</div><div class="sub">in run log</div></div>
+    <div class="kpi red"><div class="num" id="kpi-open-tasks">—</div><div class="lbl">Open Tasks</div><div class="sub" id="kpi-blocking">0 blocking</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title"><span class="icon">⊙</span> Loop State Matrix</div>
+      </div>
+      <div class="card-body">
+        <div class="matrix-head">
+          <div>Portfolio</div><div>Business</div><div>Workstream</div><div>Total</div><div>Active%</div>
+        </div>
+        <div id="loop-matrix"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+      </div>
     </div>
-  </main>
-  
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title"><span class="icon">△</span> Drift Flags</div>
+        <div class="card-badge" id="drift-badge">—</div>
+      </div>
+      <div class="card-body" id="drift-flags-body">
+        <div class="loading"><div class="spinner"></div>Loading...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title"><span class="icon">↻</span> Loop Runs</div>
+        <div class="card-badge" id="runs-badge">—</div>
+      </div>
+      <div class="card-body" id="loop-runs-body">
+        <div class="loading"><div class="spinner"></div>Loading...</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title"><span class="icon">□</span> Open Tasks</div>
+        <div class="card-badge" id="tasks-badge">—</div>
+      </div>
+      <div class="card-body" id="open-tasks-body">
+        <div class="loading"><div class="spinner"></div>Loading...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title"><span class="icon">◈</span> Evidence Coverage</div>
+      </div>
+      <div class="card-body" id="evidence-body">
+        <div class="loading"><div class="spinner"></div>Loading...</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title"><span class="icon">⊙</span> Fanout Queue</div>
+        <div class="card-badge" id="fanout-badge">—</div>
+      </div>
+      <div class="card-body" id="fanout-body">
+        <div class="loading"><div class="spinner"></div>Loading...</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title"><span class="icon">⚡</span> Wire Events</div>
+        <div class="card-badge" id="wire-badge">—</div>
+      </div>
+      <div class="card-body" id="wire-body">
+        <div class="loading"><div class="spinner"></div>Loading...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PORTFOLIO PAGE ===== -->
+<div id="page-portfolio" class="page">
+  <div class="card grid-full">
+    <div class="card-head"><div class="card-title"><span class="icon">◇</span> Loop Health by Entity</div></div>
+    <div class="card-body" id="portfolio-body"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+  </div>
+</div>
+
+<!-- ===== DRIFT PAGE ===== -->
+<div id="page-drift" class="page">
+  <div class="card grid-full">
+    <div class="card-head"><div class="card-title"><span class="icon">△</span> Drift Report</div></div>
+    <div class="card-body" id="drift-report-body"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+  </div>
+</div>
+
+<!-- ===== QUEUE PAGE ===== -->
+<div id="page-queue" class="page">
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head"><div class="card-title"><span class="icon">⊙</span> Fanout Queue</div></div>
+      <div class="card-body" id="queue-fanout-body"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title"><span class="icon">⚡</span> Recent Wire Events</div></div>
+      <div class="card-body" id="queue-wire-body"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+const SB_URL = 'https://lzfgigiyqpuuxslsygjt.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6ZmdpZ2l5cXB1dXhzbHN5Z2p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0MTc0NjksImV4cCI6MjA1OTk5MzQ2OX0.qUNzDEr2rxjRSClh5P4jeDv_18_yCCkFXTizJqNYSgg';
+
+const H = { apikey: SB_KEY, Accept: 'application/json' };
+
+async function sb(path) {
+  const r = await fetch(`${SB_URL}/rest/v1/${path}`, { headers: H });
+  if (!r.ok) throw new Error(`${r.status} ${await r.text()}`);
+  return r.json();
+}
+
+function badge(val) {
+  const cls = (val||'').toLowerCase().replace(/\s+/g,'-');
+  return `<span class="badge ${cls}">${val||''}</span>`;
+}
+
+function ts(v) {
+  if (!v) return '—';
+  try { return new Date(v).toLocaleString('en-AU', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+  catch(e) { return v; }
+}
+
+function bar(pct, color='') {
+  const p = Math.min(100, Math.round(pct||0));
+  return `<div class="bar-wrap"><div class="bar-fill ${color}" style="width:${p}%"></div></div><div style="font-size:11px;color:var(--muted);margin-top:3px">${p}%</div>`;
+}
+
+// ===== NAV =====
+function switchTab(tab) {
+  document.querySelectorAll('.nav-tab').forEach((el,i) => {
+    el.classList.toggle('active', el.textContent.toLowerCase().includes(tab.replace('-','').replace('loop','loop').toLowerCase()) || 
+      (tab==='loop-os' && i===0) || (tab==='portfolio' && i===1) || (tab==='drift' && i===2) || (tab==='queue' && i===3));
+  });
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(`page-${tab}`).classList.add('active');
+}
+
+// Clock
+function updateClock() {
+  const now = new Date();
+  document.getElementById('nav-clock').textContent = 
+    `${now.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'})} ${now.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})}`;
+}
+setInterval(updateClock, 1000); updateClock();
+
+// ===== LOAD ALL DATA =====
+async function loadAll() {
+  const [loops, runs, tasks, fanout, wire, drift, evidence] = await Promise.allSettled([
+    sb('t4h_loop?select=id,name,scope,state,mode,entity_id,last_run_at&limit=500'),
+    sb('v_t4h_loop_runs_recent?select=*&order=run_at.desc&limit=20'),
+    sb('t4h_loop_task?select=id,loop_id,title,status,blocking,created_at&limit=50'),
+    sb('v_t4h_fanout_queue?select=*&limit=20'),
+    sb('t4h_wire_event?select=id,event_type,action,actor,created_at&order=created_at.desc&limit=20'),
+    sb('drift_item?select=drift_id,severity,business_slug,resource_type,drift_type,updated_at&order=updated_at.desc&limit=20'),
+    sb('t4h_loop_evidence_link?select=loop_id&limit=500'),
+  ]);
+
+  const L = loops.value || [];
+  const R = runs.value || [];
+  const T = tasks.value || [];
+  const F = fanout.value || [];
+  const W = wire.value || [];
+  const D = drift.value || [];
+  const E = evidence.value || [];
+
+  // KPIs
+  const activeStates = ['BUILDING','VERIFYING','LIVE'];
+  const active = L.filter(l => activeStates.includes(l.state)).length;
+  const openTasks = T.filter(t => t.status === 'open').length;
+  const blocking = T.filter(t => t.status === 'open' && t.blocking).length;
+  const scopes = [...new Set(L.map(l=>l.scope))].join(' · ');
+
+  document.getElementById('kpi-total-loops').textContent = L.length;
+  document.getElementById('kpi-loops-sub').textContent = scopes;
+  document.getElementById('kpi-active').textContent = active;
+  document.getElementById('kpi-loop-runs').textContent = R.length;
+  document.getElementById('kpi-open-tasks').textContent = openTasks;
+  document.getElementById('kpi-blocking').textContent = `${blocking} blocking`;
+
+  // NAV stats
+  document.getElementById('nav-loops-active').textContent = active;
+  document.getElementById('nav-drift-ok').textContent = D.filter(d=>d.severity!=='P1').length;
+  document.getElementById('nav-needs-attn').textContent = D.filter(d=>d.severity==='P1').length + blocking;
+  document.getElementById('nav-rd-spend').textContent = '—';
+
+  // LOOP STATE MATRIX
+  const scopeList = ['PORTFOLIO','BUSINESS','WORKSTREAM'];
+  const matrixRows = scopeList.map(scope => {
+    const sl = L.filter(l=>l.scope===scope);
+    const tot = sl.length;
+    if (!tot) return null;
+    const act = sl.filter(l=>activeStates.includes(l.state)).length;
+    const pct = tot ? Math.round(act/tot*100) : 0;
+    return { scope, tot, act, pct };
+  }).filter(Boolean);
+
+  // Pivot: portfolio/business/workstream as row
+  const scopeCounts = {};
+  scopeList.forEach(s => {
+    const sl = L.filter(l=>l.scope===s);
+    scopeCounts[s] = { total: sl.length, active: sl.filter(l=>activeStates.includes(l.state)).length };
+  });
+  const p = scopeCounts['PORTFOLIO']||{total:0,active:0};
+  const b = scopeCounts['BUSINESS']||{total:0,active:0};
+  const ws = scopeCounts['WORKSTREAM']||{total:0,active:0};
+  const totalAll = p.total + b.total + ws.total;
+  const activeAll = p.active + b.active + ws.active;
+  const pctAll = totalAll ? Math.round(activeAll/totalAll*100) : 0;
+
+  document.getElementById('loop-matrix').innerHTML = `
+    <div class="matrix">
+      <div class="matrix-row">
+        <div>${badge('PORTFOLIO')}</div>
+        <div>${bar(p.total ? p.active/p.total*100 : 0)}</div>
+        <div style="font-size:13px">${p.active}/${p.total}</div>
+        <div style="font-size:13px">${p.total}</div>
+        <div style="font-size:13px">${p.total ? Math.round(p.active/p.total*100) : 0}%</div>
+      </div>
+      <div class="matrix-row">
+        <div>${badge('BUSINESS')}</div>
+        <div>${bar(b.total ? b.active/b.total*100 : 0)}</div>
+        <div style="font-size:13px">${b.active}/${b.total}</div>
+        <div style="font-size:13px">${b.total}</div>
+        <div style="font-size:13px">${b.total ? Math.round(b.active/b.total*100) : 0}%</div>
+      </div>
+      <div class="matrix-row">
+        <div>${badge('WORKSTREAM')}</div>
+        <div>${bar(ws.total ? ws.active/ws.total*100 : 0)}</div>
+        <div style="font-size:13px">${ws.active}/${ws.total}</div>
+        <div style="font-size:13px">${ws.total}</div>
+        <div style="font-size:13px">${ws.total ? Math.round(ws.active/ws.total*100) : 0}%</div>
+      </div>
+    </div>
+  `;
+
+  // DRIFT FLAGS
+  document.getElementById('drift-badge').textContent = D.length;
+  if (D.length === 0) {
+    document.getElementById('drift-flags-body').innerHTML = '<div class="empty" style="color:var(--green)">✓ No drift flags</div>';
+  } else {
+    document.getElementById('drift-flags-body').innerHTML = `
+      <table class="tbl">
+        <thead><tr><th>Severity</th><th>Business</th><th>Type</th><th>Updated</th></tr></thead>
+        <tbody>${D.map(d=>`<tr>
+          <td>${badge(d.severity)}</td>
+          <td>${d.business_slug||'—'}</td>
+          <td style="font-size:11px;color:var(--muted)">${d.drift_type||d.resource_type||'—'}</td>
+          <td class="ts">${ts(d.updated_at)}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+  }
+
+  // LOOP RUNS
+  document.getElementById('runs-badge').textContent = R.length;
+  if (R.length === 0) {
+    document.getElementById('loop-runs-body').innerHTML = '<div class="empty">No runs recorded</div>';
+  } else {
+    document.getElementById('loop-runs-body').innerHTML = `
+      <table class="tbl">
+        <thead><tr><th>Loop</th><th>Scope</th><th>State</th><th>Issues</th><th>Run At</th></tr></thead>
+        <tbody>${R.map(r=>`<tr>
+          <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.loop_name||r.loop_id||'—'}</td>
+          <td>${badge(r.scope||'—')}</td>
+          <td>${badge(r.state_after||'—')}</td>
+          <td style="color:${(r.issues_found||0)>0?'var(--amber)':'var(--green)'}">${r.issues_found||0}</td>
+          <td class="ts">${ts(r.run_at)}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+  }
+
+  // OPEN TASKS
+  const openT = T.filter(t=>t.status==='open');
+  document.getElementById('tasks-badge').textContent = openT.length;
+  if (openT.length === 0) {
+    document.getElementById('open-tasks-body').innerHTML = '<div class="empty" style="color:var(--green)">✓ No open tasks</div>';
+  } else {
+    document.getElementById('open-tasks-body').innerHTML = `
+      <table class="tbl">
+        <thead><tr><th>Task</th><th>Blocking</th><th>Created</th></tr></thead>
+        <tbody>${openT.map(t=>`<tr>
+          <td>${t.title||'—'}</td>
+          <td>${t.blocking ? '<span style="color:var(--red)">⚠ Yes</span>' : '<span style="color:var(--muted)">No</span>'}</td>
+          <td class="ts">${ts(t.created_at)}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+  }
+
+  // EVIDENCE COVERAGE
+  const withEvidence = new Set(E.map(e=>e.loop_id));
+  const covPct = L.length ? Math.round(withEvidence.size/L.length*100) : 0;
+  document.getElementById('evidence-body').innerHTML = `
+    ${bar(covPct, covPct>60?'green':covPct>30?'amber':'red')}
+    <div style="margin-top:12px;font-size:13px;color:var(--muted)">${withEvidence.size} of ${L.length} loops have evidence links</div>
+    ${E.length === 0 ? '<div class="empty" style="margin-top:8px">No evidence links yet — run workstreams to populate</div>' : ''}
+  `;
+
+  // FANOUT
+  document.getElementById('fanout-badge').textContent = F.length;
+  if (F.length === 0) {
+    document.getElementById('fanout-body').innerHTML = '<div class="empty">No records</div>';
+  } else {
+    document.getElementById('fanout-body').innerHTML = `
+      <table class="tbl">
+        <thead><tr><th>Target</th><th>Status</th><th>Attempts</th></tr></thead>
+        <tbody>${F.map(f=>`<tr>
+          <td style="font-size:12px">${f.target_system||'—'}</td>
+          <td>${badge(f.status)}</td>
+          <td style="color:var(--muted)">${f.attempts||0}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+  }
+
+  // WIRE EVENTS
+  document.getElementById('wire-badge').textContent = W.length;
+  if (W.length === 0) {
+    document.getElementById('wire-body').innerHTML = '<div class="empty">No wire events</div>';
+  } else {
+    document.getElementById('wire-body').innerHTML = `
+      <table class="tbl">
+        <thead><tr><th>Type</th><th>Action</th><th>Actor</th><th>When</th></tr></thead>
+        <tbody>${W.map(w=>`<tr>
+          <td>${badge(w.event_type)}</td>
+          <td style="font-size:12px;color:var(--muted)">${w.action||'—'}</td>
+          <td style="font-size:12px;color:var(--muted)">${w.actor||'—'}</td>
+          <td class="ts">${ts(w.created_at)}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+  }
+
+  // PORTFOLIO PAGE
+  const entities = [...new Map(L.map(l=>[l.entity_id||l.name, l])).values()].slice(0,30);
+  document.getElementById('portfolio-body').innerHTML = L.length === 0 ? '<div class="empty">No loops</div>' : `
+    <table class="tbl">
+      <thead><tr><th>Loop Name</th><th>Scope</th><th>Mode</th><th>State</th><th>Last Run</th></tr></thead>
+      <tbody>${L.slice(0,50).map(l=>`<tr>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.name||l.id}</td>
+        <td>${badge(l.scope||'—')}</td>
+        <td style="font-size:12px;color:var(--muted)">${l.mode||'—'}</td>
+        <td>${badge(l.state||'—')}</td>
+        <td class="ts">${ts(l.last_run_at)}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+
+  // DRIFT PAGE
+  document.getElementById('drift-report-body').innerHTML = D.length === 0 
+    ? '<div class="empty" style="color:var(--green)">✓ No drift items</div>'
+    : `<table class="tbl">
+        <thead><tr><th>Severity</th><th>Business</th><th>Resource</th><th>Type</th><th>Updated</th></tr></thead>
+        <tbody>${D.map(d=>`<tr>
+          <td>${badge(d.severity)}</td>
+          <td>${d.business_slug||'—'}</td>
+          <td style="font-size:12px;color:var(--muted)">${d.resource_ref||d.resource_type||'—'}</td>
+          <td style="font-size:12px;color:var(--muted)">${d.drift_type||'—'}</td>
+          <td class="ts">${ts(d.updated_at)}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+
+  // QUEUE PAGES
+  document.getElementById('queue-fanout-body').innerHTML = F.length === 0
+    ? '<div class="empty">No records</div>'
+    : `<table class="tbl">
+        <thead><tr><th>Target</th><th>Status</th><th>Attempts</th><th>Next Run</th><th>Error</th></tr></thead>
+        <tbody>${F.map(f=>`<tr>
+          <td>${f.target_system||'—'}</td>
+          <td>${badge(f.status)}</td>
+          <td style="color:var(--muted)">${f.attempts||0}</td>
+          <td class="ts">${ts(f.next_run_at)}</td>
+          <td style="font-size:11px;color:var(--red);max-width:150px;overflow:hidden;text-overflow:ellipsis">${f.last_error||''}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+
+  document.getElementById('queue-wire-body').innerHTML = W.length === 0
+    ? '<div class="empty">No events</div>'
+    : `<table class="tbl">
+        <thead><tr><th>Type</th><th>Action</th><th>Actor</th><th>When</th></tr></thead>
+        <tbody>${W.map(w=>`<tr>
+          <td>${badge(w.event_type)}</td>
+          <td style="font-size:12px;color:var(--muted)">${w.action||'—'}</td>
+          <td style="font-size:12px;color:var(--muted)">${w.actor||'—'}</td>
+          <td class="ts">${ts(w.created_at)}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+}
+
+loadAll().catch(console.error);
+setInterval(() => loadAll().catch(console.error), 30000);
+</script>
 </body>
 </html>
