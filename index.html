@@ -4,7 +4,237 @@
 <head>
   <meta charset="UTF-8">
   <title>T4H Dashboard</title>
-<!-- T4H-BRAND-INJECT v1 group=G7 -->
+<!-- T4H-BRAND-INJECT v1 group=G7 -->cmd+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T4H Master Dashboard</title>
+    <meta name="description" content="Tech 4 Humanity - Operations Dashboard">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0a0e1a; color: #e2e8f0; }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .card-hover:hover { border-color: rgba(0, 212, 255, 0.4); transform: translateY(-2px); transition: all 0.3s ease; }
+        .gradient-text { background: linear-gradient(135deg, #00d4ff, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+    <!-- T4H-BRAND-INJECT v1 group=G7 -->
+    <link rel="icon" type="image/png" sizes="32x32" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
+    <link rel="icon" type="image/x-icon" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.ico">
+    <link rel="apple-touch-icon" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
+    <meta property="og:image" content="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
+    <!-- /T4H-BRAND-INJECT -->
+</head>
+<body class="min-h-screen">
+    <nav class="sticky top-0 z-50 glass border-b border-slate-800 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <div class="flex flex-col">
+                <span class="text-xl font-bold gradient-text tracking-tighter">T4H</span>
+                <span class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-semibold">Master Dashboard</span>
+            </div>
+            <div class="h-8 w-[1px] bg-slate-800 mx-4"></div>
+            <div class="flex space-x-1" id="tabs">
+                <button onclick="switchTab('overview')" class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium transition-all text-cyan-400 bg-cyan-400/10">🔄 Overview</button>
+                <button onclick="switchTab('loops')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800">📊 Loops</button>
+                <button onclick="switchTab('drift')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800">⚠️ Drift</button>
+            </div>
+        </div>
+        <div class="flex items-center space-x-6">
+            <div id="clock" class="font-mono text-sm text-slate-400 font-bold">--:--:--</div>
+            <div class="flex items-center space-x-2">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="text-xs font-semibold text-emerald-500 uppercase tracking-widest">Live</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-8 space-y-12">
+        <!-- KPI SECTION -->
+        <section id="kpi-grid" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="glass p-6 rounded-2xl border border-slate-800/50">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Total Managed Loops</p>
+                <div id="kpi-total" class="text-4xl font-extrabold text-white">0</div>
+            </div>
+            <div class="glass p-6 rounded-2xl border border-slate-800/50">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Active Sessions</p>
+                <div id="kpi-active" class="text-4xl font-extrabold text-cyan-400">0</div>
+            </div>
+            <div class="glass p-6 rounded-2xl border border-slate-800/50">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Health Index</p>
+                <div id="kpi-health" class="text-4xl font-extrabold text-emerald-400">100%</div>
+            </div>
+            <div class="glass p-6 rounded-2xl border border-slate-800/50">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Drift Alerts</p>
+                <div id="kpi-drift" class="text-4xl font-extrabold text-amber-400">0</div>
+            </div>
+        </section>
+
+        <!-- PAGE CONTENT -->
+        <section id="page-overview" class="page space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="glass rounded-2xl overflow-hidden border border-slate-800/50">
+                    <div class="px-6 py-4 border-b border-slate-800/50 bg-slate-900/50 flex justify-between items-center">
+                        <h2 class="font-bold text-sm uppercase tracking-widest text-slate-300">🚀 Deployment Status</h2>
+                        <span class="text-[10px] text-slate-500 font-mono">Last 24h</span>
+                    </div>
+                    <div id="deployment-list" class="p-6 space-y-4">
+                        <div class="flex items-center justify-center py-12 text-slate-500">Loading infrastructure state...</div>
+                    </div>
+                </div>
+                <div class="glass rounded-2xl overflow-hidden border border-slate-800/50">
+                    <div class="px-6 py-4 border-b border-slate-800/50 bg-slate-900/50 flex justify-between items-center">
+                        <h2 class="font-bold text-sm uppercase tracking-widest text-slate-300">⚠️ Active Drift Items</h2>
+                        <button onclick="switchTab('drift')" class="text-[10px] text-cyan-400 hover:underline">View All</button>
+                    </div>
+                    <div id="drift-preview" class="p-6 space-y-4">
+                        <div class="flex items-center justify-center py-12 text-slate-500">Monitoring for anomalies...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-loops" class="page hidden space-y-6">
+            <div class="glass rounded-2xl border border-slate-800/50 p-8">
+                <h2 class="text-2xl font-bold mb-6">Loop Registry</h2>
+                <div id="full-loop-table" class="overflow-x-auto">
+                    <!-- Table injected here -->
+                </div>
+            </div>
+        </section>
+
+        <section id="page-drift" class="page hidden space-y-6">
+            <div class="glass rounded-2xl border border-slate-800/50 p-8">
+                <h2 class="text-2xl font-bold mb-6">System Drift Analysis</h2>
+                <div id="full-drift-table" class="overflow-x-auto">
+                    <!-- Table injected here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="mt-20 border-t border-slate-800 py-12 px-8 glass">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-slate-500 text-xs font-bold uppercase tracking-widest">
+            <div>&copy; 2026 Tech 4 Humanity Ltd</div>
+            <div class="flex space-x-8">
+                <span class="text-slate-600">Group: G7</span>
+                <span id="version" class="text-cyan-500/50">v1.2.4-agentic</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const SB_URL = 'https://lzfgigiyqpuuxslsygjt.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6ZmdpZ2l5cXB1dXhzbHN5Z2p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0MTc0NjksImV4cCI6MjA1OTk5MzQ2OX0.qUNzDEr2rxjRSClh5P4jeDv_18_yCCkFXTizJqNYSgg';
+
+        async function sb(path) {
+            try {
+                const r = await fetch(`${SB_URL}/rest/v1/${path}`, {
+                    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, Accept: 'application/json' }
+                });
+                return r.ok ? r.json() : [];
+            } catch(e) { console.error(e); return []; }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById(`page-${tabId}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('active', 'text-cyan-400', 'bg-cyan-400/10');
+                b.classList.add('text-slate-400');
+            });
+            const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.textContent.toLowerCase().includes(tabId));
+            if (activeBtn) {
+                activeBtn.classList.add('active', 'text-cyan-400', 'bg-cyan-400/10');
+                activeBtn.classList.remove('text-slate-400');
+            }
+        }
+
+        function updateClock() {
+            document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-AU', { hour12: false });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        async function refresh() {
+            const [loops, drifts] = await Promise.all([
+                sb('t4h_loop?select=*&order=id.desc'),
+                sb('drift_item?select=*&order=created_at.desc&limit=20')
+            ]);
+
+            // KPI
+            document.getElementById('kpi-total').textContent = loops.length;
+            const activeCount = loops.filter(l => ['LIVE', 'BUILDING'].includes(l.state)).length;
+            document.getElementById('kpi-active').textContent = activeCount;
+            document.getElementById('kpi-drift').textContent = drifts.length;
+            
+            // Health calc (example)
+            const health = loops.length > 0 ? Math.round((activeCount / loops.length) * 100) : 100;
+            document.getElementById('kpi-health').textContent = health + '%';
+
+            // Deployment Matrix (Overview)
+            document.getElementById('deployment-list').innerHTML = loops.slice(0, 5).map(l => `
+                <div class="flex items-center justify-between p-4 rounded-xl bg-slate-900/30 border border-slate-800/50 card-hover">
+                    <div class="flex flex-col">
+                        <span class="text-sm font-bold text-white">${l.name}</span>
+                        <span class="text-[10px] text-slate-500 uppercase tracking-tighter">${l.description || 'System Loop'}</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="h-1.5 w-24 bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full ${l.state === 'LIVE' ? 'bg-emerald-500' : 'bg-cyan-500'} animate-pulse" style="width: ${l.state === 'LIVE' ? '100%' : '65%'}"></div>
+                        </div>
+                        <span class="text-[10px] font-black text-slate-400 px-2 py-1 rounded bg-slate-800/50">${l.state}</span>
+                    </div>
+                </div>
+            `).join('') || '<div class="text-center py-8 text-slate-600">No active deployments</div>';
+
+            // Drift Preview
+            document.getElementById('drift-preview').innerHTML = drifts.slice(0, 5).map(d => `
+                <div class="flex items-start space-x-4 p-4 rounded-xl bg-amber-500/5 border border-amber-500/10 card-hover">
+                    <div class="text-amber-500 text-lg">⚠️</div>
+                    <div class="flex flex-col">
+                        <span class="text-sm font-bold text-slate-200">${d.title || d.description}</span>
+                        <span class="text-[10px] text-amber-500/70 font-mono">${new Date(d.created_at).toLocaleString()}</span>
+                    </div>
+                </div>
+            `).join('') || '<div class="text-center py-8 text-slate-600">System is stable</div>';
+
+            // Tables
+            const renderTable = (data, headers) => `
+                <table class="w-full text-left">
+                    <thead><tr class="text-slate-500 text-[10px] uppercase tracking-widest border-b border-slate-800"><th class="pb-4">${headers.join('</th><th class="pb-4">')}</th></tr></thead>
+                    <tbody class="text-sm divide-y divide-slate-800">
+                        ${data.map(row => `<tr class="hover:bg-slate-800/30 transition-colors"><td class="py-4 font-semibold">${Object.values(row).join('</td><td class="py-4">')}</td></tr>`).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('full-loop-table').innerHTML = renderTable(
+                loops.map(l => ({ name: l.name, state: l.state, last: new Date(l.updated_at || Date.now()).toLocaleDateString() })),
+                ['Loop Name', 'State', 'Last Activity']
+            );
+
+            document.getElementById('full-drift-table').innerHTML = renderTable(
+                drifts.map(d => ({ title: d.title || d.description, status: 'OPEN', date: new Date(d.created_at).toLocaleDateString() })),
+                ['Issue', 'Status', 'Detected']
+            );
+        }
+
+        refresh();
+        setInterval(refresh, 15000);
+    </script>
+</body>
+</html>
+
 <link rel="icon" type="image/png" sizes="32x32" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
 <link rel="icon" type="image/x-icon" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.ico">
 <link rel="apple-touch-icon" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
