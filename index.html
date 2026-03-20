@@ -1,25 +1,10 @@
-<!-- trigger build -->
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>T4H Dashboard</title>
-<!-- T4H-BRAND-INJECT v1 group=G7 -->cmd+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>T4H Master Dashboard</title>
     <meta name="description" content="Tech 4 Humanity - Operations Dashboard">
-    <link rel="icon" type="image/png" sizes="32x32" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0a0e1a; color: #e2e8f0; }
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .card-hover:hover { border-color: rgba(0, 212, 255, 0.4); transform: translateY(-2px); transition: all 0.3s ease; }
-        .gradient-text { background: linear-gradient(135deg, #00d4ff, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    </style>
     <!-- T4H-BRAND-INJECT v1 group=G7 -->
     <link rel="icon" type="image/png" sizes="32x32" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
     <link rel="icon" type="image/x-icon" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.ico">
@@ -30,6 +15,14 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
     <!-- /T4H-BRAND-INJECT -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0a0e1a; color: #e2e8f0; }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .card-hover:hover { border-color: rgba(0, 212, 255, 0.4); transform: translateY(-2px); transition: all 0.3s ease; }
+        .gradient-text { background: linear-gradient(135deg, #00d4ff, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
 </head>
 <body class="min-h-screen">
     <nav class="sticky top-0 z-50 glass border-b border-slate-800 px-6 py-4 flex items-center justify-between">
@@ -190,9 +183,9 @@
                     </div>
                     <div class="flex items-center space-x-3">
                         <div class="h-1.5 w-24 bg-slate-800 rounded-full overflow-hidden">
-                            <div class="h-full ${l.state === 'LIVE' ? 'bg-emerald-500' : 'bg-cyan-500'} animate-pulse" style="width: ${l.state === 'LIVE' ? '100%' : '65%'}"></div>
+                            <div class="h-full \${l.state === 'LIVE' ? 'bg-emerald-500' : 'bg-cyan-500'} animate-pulse" style="width: \${l.state === 'LIVE' ? '100%' : '65%'}"></div>
                         </div>
-                        <span class="text-[10px] font-black text-slate-400 px-2 py-1 rounded bg-slate-800/50">${l.state}</span>
+                        <span class="text-[10px] font-black text-slate-400 px-2 py-1 rounded bg-slate-800/50">\${l.state}</span>
                     </div>
                 </div>
             `).join('') || '<div class="text-center py-8 text-slate-600">No active deployments</div>';
@@ -202,8 +195,8 @@
                 <div class="flex items-start space-x-4 p-4 rounded-xl bg-amber-500/5 border border-amber-500/10 card-hover">
                     <div class="text-amber-500 text-lg">⚠️</div>
                     <div class="flex flex-col">
-                        <span class="text-sm font-bold text-slate-200">${d.title || d.description}</span>
-                        <span class="text-[10px] text-amber-500/70 font-mono">${new Date(d.created_at).toLocaleString()}</span>
+                        <span class="text-sm font-bold text-slate-200">\${d.title || d.description}</span>
+                        <span class="text-[10px] text-amber-500/70 font-mono">\${new Date(d.created_at).toLocaleString()}</span>
                     </div>
                 </div>
             `).join('') || '<div class="text-center py-8 text-slate-600">System is stable</div>';
@@ -211,9 +204,9 @@
             // Tables
             const renderTable = (data, headers) => `
                 <table class="w-full text-left">
-                    <thead><tr class="text-slate-500 text-[10px] uppercase tracking-widest border-b border-slate-800"><th class="pb-4">${headers.join('</th><th class="pb-4">')}</th></tr></thead>
+                    <thead><tr class="text-slate-500 text-[10px] uppercase tracking-widest border-b border-slate-800"><th class="pb-4">\${headers.join('</th><th class="pb-4">')}</th></tr></thead>
                     <tbody class="text-sm divide-y divide-slate-800">
-                        ${data.map(row => `<tr class="hover:bg-slate-800/30 transition-colors"><td class="py-4 font-semibold">${Object.values(row).join('</td><td class="py-4">')}</td></tr>`).join('')}
+                        \${data.map(row => `<tr class="hover:bg-slate-800/30 transition-colors"><td class="py-4 font-semibold">\${Object.values(row).join('</td><td class="py-4">')}</td></tr>`).join('')}
                     </tbody>
                 </table>
             `;
@@ -232,20 +225,5 @@
         refresh();
         setInterval(refresh, 15000);
     </script>
-</body>
-</html>
-
-<link rel="icon" type="image/png" sizes="32x32" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
-<link rel="icon" type="image/x-icon" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.ico">
-<link rel="apple-touch-icon" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
-<meta property="og:image" content="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
-<!-- /T4H-BRAND-INJECT -->
-</head>
-<body>
-  <h1>Building...</h1>
 </body>
 </html>
