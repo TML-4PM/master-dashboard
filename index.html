@@ -1,268 +1,373 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/AHC%20droid%20head.webp" type="image/webp">
-  <link rel="apple-touch-icon" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/AHC%20droid%20head.webp">
-  <link rel="shortcut icon" href="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/AHC%20droid%20head.webp" type="image/webp">
-  <meta property="og:image" content="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/AHC%20droid%20head.webp">
-  <meta name="twitter:image" content="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/AHC%20droid%20head.webp">
-  <meta name="twitter:card" content="summary">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>T4H Master Dashboard</title>
-    <meta name="description" content="Tech 4 Humanity - Operations Dashboard">
-    <!-- T4H-BRAND-INJECT v1 group=G7 -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://lzfgigiyqpuuxslsygjt.supabase.co/storage/v1/object/public/images/t4h-icon.png">
-    <!-- /T4H-BRAND-INJECT -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0a0e1a; color: #e2e8f0; }
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .card-hover:hover { border-color: rgba(0, 212, 255, 0.4); transform: translateY(-2px); transition: all 0.3s ease; }
-        .gradient-text { background: linear-gradient(135deg, #00d4ff, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    </style>
-</head>
-<body class="min-h-screen">
-    <nav class="sticky top-0 z-50 glass border-b border-slate-800 px-6 py-4 flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-            <div class="flex flex-col">
-                <span class="text-xl font-bold gradient-text tracking-tighter">T4H</span>
-                <span class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-semibold">Master Dashboard</span>
-            </div>
-            <div class="h-8 w-[1px] bg-slate-800 mx-4"></div>
-            <div class="flex space-x-1" id="tabs">
-                <button onclick="switchTab('overview')" class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium transition-all text-cyan-400 bg-cyan-400/10">🔄 Overview</button>
-                <button onclick="switchTab('loops')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800">📊 Loops</button>
-                <button onclick="switchTab('drift')" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800">⚠️ Drift</button>
-            </div>
-        </div>
-        <div class="flex items-center space-x-6">
-            <div id="clock" class="font-mono text-sm text-slate-400 font-bold">--:--:--</div>
-            <div class="flex items-center space-x-2">
-                <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <span class="text-xs font-semibold text-emerald-500 uppercase tracking-widest">Live</span>
-            </div>
-        </div>
-    </nav>
-
-    <main class="max-w-7xl mx-auto p-8 space-y-12">
-        <!-- KPI SECTION -->
-        <section id="kpi-grid" class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div class="glass p-6 rounded-2xl border border-slate-800/50">
-                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Total Managed Loops</p>
-                <div id="kpi-total" class="text-4xl font-extrabold text-white">0</div>
-            </div>
-            <div class="glass p-6 rounded-2xl border border-slate-800/50">
-                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Active Sessions</p>
-                <div id="kpi-active" class="text-4xl font-extrabold text-cyan-400">0</div>
-            </div>
-            <div class="glass p-6 rounded-2xl border border-slate-800/50">
-                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Health Index</p>
-                <div id="kpi-health" class="text-4xl font-extrabold text-emerald-400">100%</div>
-            </div>
-            <div class="glass p-6 rounded-2xl border border-slate-800/50">
-                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Drift Alerts</p>
-                <div id="kpi-drift" class="text-4xl font-extrabold text-amber-400">0</div>
-            </div>
-        </section>
-
-        <!-- PAGE CONTENT -->
-        <section id="page-overview" class="page space-y-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="glass rounded-2xl overflow-hidden border border-slate-800/50">
-                    <div class="px-6 py-4 border-b border-slate-800/50 bg-slate-900/50 flex justify-between items-center">
-                        <h2 class="font-bold text-sm uppercase tracking-widest text-slate-300">🚀 Deployment Status</h2>
-                        <span class="text-[10px] text-slate-500 font-mono">Last 24h</span>
-                    </div>
-                    <div id="deployment-list" class="p-6 space-y-4">
-                        <div class="flex items-center justify-center py-12 text-slate-500">Loading infrastructure state...</div>
-                    </div>
-                </div>
-                <div class="glass rounded-2xl overflow-hidden border border-slate-800/50">
-                    <div class="px-6 py-4 border-b border-slate-800/50 bg-slate-900/50 flex justify-between items-center">
-                        <h2 class="font-bold text-sm uppercase tracking-widest text-slate-300">⚠️ Active Drift Items</h2>
-                        <button onclick="switchTab('drift')" class="text-[10px] text-cyan-400 hover:underline">View All</button>
-                    </div>
-                    <div id="drift-preview" class="p-6 space-y-4">
-                        <div class="flex items-center justify-center py-12 text-slate-500">Monitoring for anomalies...</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="page-loops" class="page hidden space-y-6">
-            <div class="glass rounded-2xl border border-slate-800/50 p-8">
-                <h2 class="text-2xl font-bold mb-6">Loop Registry</h2>
-                <div id="full-loop-table" class="overflow-x-auto">
-                    <!-- Table injected here -->
-                </div>
-            </div>
-        </section>
-
-        <section id="page-drift" class="page hidden space-y-6">
-            <div class="glass rounded-2xl border border-slate-800/50 p-8">
-                <h2 class="text-2xl font-bold mb-6">System Drift Analysis</h2>
-                <div id="full-drift-table" class="overflow-x-auto">
-                    <!-- Table injected here -->
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="mt-20 border-t border-slate-800 py-12 px-8 glass">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-slate-500 text-xs font-bold uppercase tracking-widest">
-            <div>&copy; 2026 Tech 4 Humanity Ltd</div>
-            <div class="flex space-x-8">
-                <span class="text-slate-600">Group: G7</span>
-                <span id="version" class="text-cyan-500/50">v1.2.4-agentic</span>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        const SB_URL = 'https://lzfgigiyqpuuxslsygjt.supabase.co';
-        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6ZmdpZ2l5cXB1dXhzbHN5Z2p0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0MTc0NjksImV4cCI6MjA1OTk5MzQ2OX0.qUNzDEr2rxjRSClh5P4jeDv_18_yCCkFXTizJqNYSgg';
-
-        async function sb(path) {
-            try {
-                const r = await fetch(`${SB_URL}/rest/v1/${path}`, {
-                    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, Accept: 'application/json' }
-                });
-                return r.ok ? r.json() : [];
-            } catch(e) { console.error(e); return []; }
+        :root {
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --primary: #0ea5e9;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
         }
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            document.getElementById(`page-${tabId}`).classList.remove('hidden');
-            
-            document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('active', 'text-cyan-400', 'bg-cyan-400/10');
-                b.classList.add('text-slate-400');
-            });
-            const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.textContent.toLowerCase().includes(tabId));
-            if (activeBtn) {
-                activeBtn.classList.add('active', 'text-cyan-400', 'bg-cyan-400/10');
-                activeBtn.classList.remove('text-slate-400');
+        .dark {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #38bdf8;
+            --border: #334155;
+        }
+
+        * { box-sizing: border-box; }
+        body { 
+            margin: 0; 
+            font-family: 'DM Sans', sans-serif; 
+            background: var(--bg); 
+            color: var(--text);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        header {
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo { font-weight: 700; font-size: 1.2rem; letter-spacing: -0.02em; }
+        .logo span { color: var(--primary); }
+
+        nav { display: flex; gap: 1.5rem; }
+        nav a { 
+            text-decoration: none; 
+            color: var(--text-muted); 
+            font-size: 0.9rem; 
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        nav a.active { color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 0.25rem; }
+
+        .theme-toggle {
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        main { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 0.5rem; }
+        .stat-value { font-family: 'DM Mono', monospace; font-size: 1.75rem; font-weight: 500; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title { font-weight: 600; font-size: 0.95rem; }
+
+        .panel-content { padding: 1.5rem; flex: 1; }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-muted);
+            min-height: 200px;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            border: none;
+            transition: opacity 0.2s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-size: 0.75rem; color: var(--text-muted); padding: 0.75rem 0; border-bottom: 1px solid var(--border); text-transform: uppercase; }
+        td { padding: 1rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+
+        .status-pill {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-idle { background: #f1f5f9; color: #475569; }
+        .status-active { background: #ecfdf5; color: #059669; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 400px;
+            max-width: 90%;
+        }
+
+        form label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem; margin-top: 1rem; }
+        form input, form select, form textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .audit-item { padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+        .audit-time { color: var(--text-muted); font-size: 0.75rem; margin-right: 0.5rem; }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem; right: 2rem;
+            background: var(--text);
+            color: var(--bg);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            display: none;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">T4H <span>Master Dashboard</span></div>
+        <nav>
+            <a href="#" class="active" onclick="showTab('loop-os')">Loop OS</a>
+            <a href="#" onclick="showTab('finance')">Finance</a>
+            <a href="#" onclick="showTab('research')">Research</a>
+            <a href="#" onclick="showTab('infra')">Infra</a>
+            <a href="#" onclick="showTab('portfolio')">Portfolio</a>
+            <a href="#" onclick="showTab('jobs')">Jobs</a>
+        </nav>
+        <button class="theme-toggle" onclick="toggleTheme()">☀️</button>
+    </header>
+
+    <main>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-label">Total Loops</div><div class="stat-value" id="count-total">0</div></div>
+            <div class="stat-card"><div class="stat-label">Active</div><div class="stat-value" id="count-active">0</div></div>
+            <div class="stat-card"><div class="stat-label">Loop Runs</div><div class="stat-value" id="count-runs">0</div></div>
+            <div class="stat-card"><div class="stat-label">Open Tasks</div><div class="stat-value" id="count-tasks">0</div></div>
+            <div class="stat-card"><div class="stat-label">Drift Flags</div><div class="stat-value" id="count-drift">0</div></div>
+            <div class="stat-card"><div class="stat-label">R&D Spend</div><div class="stat-value">$0.00</div></div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">Loop State Matrix</div>
+                    <button class="btn btn-primary" onclick="openModal()">+ Define Loop</button>
+                </div>
+                <div class="panel-content" id="matrix-content">
+                    <div class="empty-state">
+                        <p>No loops defined yet.</p>
+                        <button class="btn btn-outline" onclick="openModal()">Create your first loop</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header"><div class="panel-title">Audit Trail</div></div>
+                <div class="panel-content" id="audit-trail">
+                    <div class="empty-state">No activity yet.</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal" id="loop-modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0">Define New Loop</h3>
+            <form id="loop-form" onsubmit="saveLoop(event)">
+                <label>Loop Name</label>
+                <input type="text" id="loop-name" placeholder="e.g. RDTI Evidence Sweep" required>
+                
+                <label>Portfolio Slice</label>
+                <select id="loop-portfolio">
+                    <option>Research</option><option>Finance</option><option>Infra</option><option>Portfolio</option><option>Jobs</option>
+                </select>
+
+                <label>Cadence</label>
+                <select id="loop-cadence">
+                    <option>Daily</option><option>Weekly</option><option>Monthly</option>
+                </select>
+
+                <label>Workstream Source</label>
+                <input type="text" id="loop-source" placeholder="e.g. GitHub, Xero, Vercel">
+
+                <div style="display:flex; gap:1rem; margin-top:2rem;">
+                    <button type="button" class="btn btn-outline" style="flex:1" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex:1">Save Loop</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let loops = [];
+        let runs = 0;
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            const btn = document.querySelector('.theme-toggle');
+            btn.innerText = document.body.classList.contains('dark') ? '🌙' : '☀️';
+        }
+
+        function showTab(id) {
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+            event.target.classList.add('active');
+            notify(`Switched to ${id.toUpperCase()} view`);
+        }
+
+        function openModal() { document.getElementById('loop-modal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('loop-modal').style.display = 'none'; }
+
+        function saveLoop(e) {
+            e.preventDefault();
+            const loop = {
+                id: Date.now(),
+                name: document.getElementById('loop-name').value,
+                portfolio: document.getElementById('loop-portfolio').value,
+                cadence: document.getElementById('loop-cadence').value,
+                source: document.getElementById('loop-source').value || 'Manual',
+                status: 'Idle'
+            };
+            loops.push(loop);
+            updateDashboard();
+            log(`Defined loop: ${loop.name}`);
+            closeModal();
+            document.getElementById('loop-form').reset();
+            notify('Loop saved successfully');
+        }
+
+        function runLoop(id) {
+            const loop = loops.find(l => l.id === id);
+            loop.status = 'Active';
+            runs++;
+            updateDashboard();
+            log(`Triggered run for: ${loop.name}`);
+            notify(`Running ${loop.name}...`);
+            setTimeout(() => {
+                loop.status = 'Idle';
+                updateDashboard();
+                log(`Completed run for: ${loop.name}`);
+            }, 2000);
+        }
+
+        function updateDashboard() {
+            document.getElementById('count-total').innerText = loops.length;
+            document.getElementById('count-active').innerText = loops.filter(l => l.status === 'Active').length;
+            document.getElementById('count-runs').innerText = runs;
+
+            const matrix = document.getElementById('matrix-content');
+            if (loops.length === 0) {
+                matrix.innerHTML = '<div class="empty-state"><p>No loops defined yet.</p><button class="btn btn-outline" onclick="openModal()">Create your first loop</button></div>';
+            } else {
+                matrix.innerHTML = `<table>
+                    <thead><tr><th>Loop</th><th>Portfolio</th><th>Cadence</th><th>Source</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody>${loops.map(l => `
+                        <tr>
+                            <td><strong>${l.name}</strong></td>
+                            <td>${l.portfolio}</td>
+                            <td>${l.cadence}</td>
+                            <td>${l.source}</td>
+                            <td><span class="status-pill status-${l.status.toLowerCase()}">${l.status}</span></td>
+                            <td><button class="btn btn-outline" onclick="runLoop(${l.id})">▶ Run</button></td>
+                        </tr>
+                    `).join('')}</tbody>
+                </table>`;
             }
         }
 
-        function updateClock() {
-            document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-AU', { hour12: false });
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        async function refresh() {
-            const [loops, drifts] = await Promise.all([
-                sb('t4h_loop?select=*&order=id.desc'),
-                sb('drift_item?select=*&order=created_at.desc&limit=20')
-            ]);
-
-            // KPI
-            document.getElementById('kpi-total').textContent = loops.length;
-            const activeCount = loops.filter(l => ['LIVE', 'BUILDING'].includes(l.state)).length;
-            document.getElementById('kpi-active').textContent = activeCount;
-            document.getElementById('kpi-drift').textContent = drifts.length;
-            
-            // Health calc (example)
-            const health = loops.length > 0 ? Math.round((activeCount / loops.length) * 100) : 100;
-            document.getElementById('kpi-health').textContent = health + '%';
-
-            // Deployment Matrix (Overview)
-            document.getElementById('deployment-list').innerHTML = loops.slice(0, 5).map(l => `
-                <div class="flex items-center justify-between p-4 rounded-xl bg-slate-900/30 border border-slate-800/50 card-hover">
-                    <div class="flex flex-col">
-                        <span class="text-sm font-bold text-white">${l.name}</span>
-                        <span class="text-[10px] text-slate-500 uppercase tracking-tighter">${l.description || 'System Loop'}</span>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <div class="h-1.5 w-24 bg-slate-800 rounded-full overflow-hidden">
-                            <div class="h-full \${l.state === 'LIVE' ? 'bg-emerald-500' : 'bg-cyan-500'} animate-pulse" style="width: \${l.state === 'LIVE' ? '100%' : '65%'}"></div>
-                        </div>
-                        <span class="text-[10px] font-black text-slate-400 px-2 py-1 rounded bg-slate-800/50">\${l.state}</span>
-                    </div>
-                </div>
-            `).join('') || '<div class="text-center py-8 text-slate-600">No active deployments</div>';
-
-            // Drift Preview
-            document.getElementById('drift-preview').innerHTML = drifts.slice(0, 5).map(d => `
-                <div class="flex items-start space-x-4 p-4 rounded-xl bg-amber-500/5 border border-amber-500/10 card-hover">
-                    <div class="text-amber-500 text-lg">⚠️</div>
-                    <div class="flex flex-col">
-                        <span class="text-sm font-bold text-slate-200">\${d.title || d.description}</span>
-                        <span class="text-[10px] text-amber-500/70 font-mono">\${new Date(d.created_at).toLocaleString()}</span>
-                    </div>
-                </div>
-            `).join('') || '<div class="text-center py-8 text-slate-600">System is stable</div>';
-
-            // Tables
-            const renderTable = (data, headers) => `
-                <table class="w-full text-left">
-                    <thead><tr class="text-slate-500 text-[10px] uppercase tracking-widest border-b border-slate-800"><th class="pb-4">\${headers.join('</th><th class="pb-4">')}</th></tr></thead>
-                    <tbody class="text-sm divide-y divide-slate-800">
-                        \${data.map(row => `<tr class="hover:bg-slate-800/30 transition-colors"><td class="py-4 font-semibold">\${Object.values(row).join('</td><td class="py-4">')}</td></tr>`).join('')}
-                    </tbody>
-                </table>
-            `;
-
-            document.getElementById('full-loop-table').innerHTML = renderTable(
-                loops.map(l => ({ name: l.name, state: l.state, last: new Date(l.updated_at || Date.now()).toLocaleDateString() })),
-                ['Loop Name', 'State', 'Last Activity']
-            );
-
-            document.getElementById('full-drift-table').innerHTML = renderTable(
-                drifts.map(d => ({ title: d.title || d.description, status: 'OPEN', date: new Date(d.created_at).toLocaleDateString() })),
-                ['Issue', 'Status', 'Detected']
-            );
+        function log(msg) {
+            const audit = document.getElementById('audit-trail');
+            if (audit.querySelector('.empty-state')) audit.innerHTML = '';
+            const item = document.createElement('div');
+            item.className = 'audit-item';
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            item.innerHTML = `<span class="audit-time">${time}</span> ${msg}`;
+            audit.prepend(item);
         }
 
-        refresh();
-        setInterval(refresh, 15000);
+        function notify(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
     </script>
-    
-<!-- Snow Effect -->
-<canvas id="hob-snow" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;"></canvas>
-<script>
-(function(){
-  var c=document.getElementById('hob-snow');
-  var ctx=c.getContext('2d');
-  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
-  resize();
-  window.addEventListener('resize',resize);
-  var flakes=[];
-  for(var i=0;i<150;i++){
-    flakes.push({
-      x:Math.random()*window.innerWidth,
-      y:Math.random()*window.innerHeight,
-      r:Math.random()*3+1,
-      speed:Math.random()*1.2+0.4,
-      drift:Math.random()*0.8-0.4,
-      opacity:Math.random()*0.5+0.3
-    });
-  }
-  function draw(){
-    ctx.clearRect(0,0,c.width,c.height);
-    flakes.forEach(function(f){
-      ctx.beginPath();
-      ctx.arc(f.x,f.y,f.r,0,Math.PI*2);
-      ctx.fillStyle='rgba(255,255,255,'+f.opacity+')';
-      ctx.fill();
-      f.y+=f.speed;
-      f.x+=f.drift;
-      if(f.y>c.height+5){f.y=-5;f.x=Math.random()*c.width;}
-      if(f.x>c.width+5){f.x=-5;}
-      if(f.x<-5){f.x=c.width+5;}
-    });
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
-</script>
 </body>
 </html>
